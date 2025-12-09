@@ -263,7 +263,7 @@ export default function Page() {
                 ...ev,
                 time: ev.time ?? '',
                 title: ev.title ?? '',
-                description: ev.description ?? '',
+                // description sengaja nggak dikirim karena tipe Item di AgendaTimelineItem nggak punya field ini
                 location: ev.location ?? '',
               }}
             />
