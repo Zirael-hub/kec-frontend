@@ -1,0 +1,1 @@
+export default function OfflinePage(){ return (<section className="space-y-2"><h1 className="text-xl font-bold">Anda sedang offline</h1><p className="text-sm text-slate-600">Beberapa konten mungkin tidak tersedia. Coba lagi saat koneksi pulih.</p></section>) }

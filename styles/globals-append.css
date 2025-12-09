@@ -1,0 +1,3 @@
+/* === UX Enhancements === */
+@keyframes fade { from { opacity:.6; transform: translateY(4px) } to { opacity:1; transform:none } }
+.animate-fade { animation: fade .18s ease-out; }

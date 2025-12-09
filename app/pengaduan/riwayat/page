@@ -1,0 +1,33 @@
+import ComplaintCard, { type ComplaintItem } from '@/components/ComplaintCard'
+import Link from 'next/link'
+
+export const metadata = { title: 'Riwayat Pengaduan' }
+
+async function loadAll(): Promise<ComplaintItem[]> {
+  // TODO: ganti fetch + pagination
+  return [
+    { id:'A-1023', name:'Budi',   category:'Infrastruktur', summary:'Jalan desa berlubang…', date:'2025-09-18', status:'Proses' },
+    { id:'A-1019', name:'Sari',   category:'Pelayanan',     summary:'Antrian pelayanan KTP…', date:'2025-09-16', status:'Baru' },
+    { id:'A-1002', name:'Rahman', category:'Keamanan',      summary:'Lampu PJU padam…',      date:'2025-09-10', status:'Selesai' },
+  ]
+}
+
+export default async function Page(){
+  const items = await loadAll()
+  return (
+    <main className="mx-auto w-full max-w-[420px] space-y-5 px-4 pb-24 pt-4 text-slate-900 dark:text-slate-100">
+      <div className="rounded-2xl bg-gradient-to-br from-slate-500/90 to-slate-700/90 px-4 py-5 text-white shadow-sm ring-1 ring-black/5">
+        <h1 className="text-lg font-bold leading-tight">Riwayat Pengaduan</h1>
+        <p className="text-xs/5 opacity-90">Lihat status pengaduan yang pernah dikirim</p>
+      </div>
+
+      <section className="space-y-3">
+        {items.map(it => <ComplaintCard key={it.id} item={it} />)}
+      </section>
+
+      <div className="pt-2 text-center text-[11px] text-slate-500">
+        <Link href="/pengaduan" className="underline">Kembali ke Form</Link>
+      </div>
+    </main>
+  )
+}

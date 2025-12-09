@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Saat dibuka sebagai PWA standalone, paksa layout ringkas */
+@media (display-mode: standalone) {
+  body { background: #f8fafc; }
+  .mobile-shell { max-width: 420px; margin: 0 auto; }
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
