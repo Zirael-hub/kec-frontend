@@ -40,17 +40,21 @@ function toDayKey(input: string): string {
   return `${y}-${mo}-${da}`
 }
 
-function pad2(n: number) { return String(n).padStart(2, '0') }
+function pad2(n: number) {
+  return String(n).padStart(2, '0')
+}
 
 function monthNameId(year: number, month0: number) {
   // label bulan pakai locale id-ID
   return new Intl.DateTimeFormat('id-ID', { month: 'long' }).format(new Date(year, month0, 1))
 }
+
 function sameMonth(ymd: string, year: number, month0: number) {
   const m = ymd.match(/^(\d{4})-(\d{2})-\d{2}$/)
   if (!m) return false
   return Number(m[1]) === year && Number(m[2]) === month0 + 1
 }
+
 /** Pastikan tanggal yang dipilih dari kalender tetap di bulan yang sedang dilihat */
 function normalizePickToViewMonth(ymdOrIso: string, viewYear: number, viewMonth0: number) {
   const m = ymdOrIso.match(/^\d{4}-\d{2}-\d{2}$/)
@@ -70,34 +74,42 @@ async function fetchAgenda(): Promise<EventItem[]> {
     const r = await fetch(`${API_BASE}/api/agenda?from=1900-01-01&limit=500`, { cache: 'no-store' })
     if (!r.ok) throw new Error(`HTTP ${r.status}`)
     let payload: any
-    try { payload = await r.json() } catch { return [] }
+    try {
+      payload = await r.json()
+    } catch {
+      return []
+    }
 
     const rows: any[] =
       Array.isArray(payload?.items) ? payload.items :
       Array.isArray(payload) ? payload :
       []
 
-    const items: EventItem[] = rows.map((it: any, i: number) => {
-      // PENTING: iso > date > datetime > tanggal
-      const rawDate: string = String(it.iso ?? it.date ?? it.datetime ?? it.tanggal ?? '')
-      const dayKey = toDayKey(rawDate)
-      if (!dayKey) return null
+    const items: EventItem[] = rows
+      .map((it: any, i: number) => {
+        // PENTING: iso > date > datetime > tanggal
+        const rawDate: string = String(it.iso ?? it.date ?? it.datetime ?? it.tanggal ?? '')
+        const dayKey = toDayKey(rawDate)
+        if (!dayKey) return null
 
-      return {
-        id: String(it.id ?? it.slug ?? `ev-${i}`),
-        title: String(it.title ?? it.judul ?? '-'),
-        date: rawDate, // simpan apa adanya buat display
-        time: it.time ?? null, // "09:00 – Selesai" kalau ada
-        location: it.location ?? it.place ?? null,
-        banner: absolutize(it.banner ?? it.banner_url ?? it.image_url ?? it.cover),
-        description: Array.isArray(it.description) ? it.description.join('\n') : (it.description ?? null),
-        _dayKey: dayKey,
-      }
-    }).filter(Boolean) as EventItem[]
+        return {
+          id: String(it.id ?? it.slug ?? `ev-${i}`),
+          title: String(it.title ?? it.judul ?? '-'),
+          date: rawDate, // simpan apa adanya buat display
+          time: it.time ?? null, // "09:00 – Selesai" kalau ada
+          location: it.location ?? it.place ?? null,
+          banner: absolutize(it.banner ?? it.banner_url ?? it.image_url ?? it.cover),
+          description: Array.isArray(it.description) ? it.description.join('\n') : (it.description ?? null),
+          _dayKey: dayKey,
+        }
+      })
+      .filter(Boolean) as EventItem[]
 
     // Urutkan per hari, lalu jam (string)
     items.sort((a, b) => {
-      if (a._dayKey === b._dayKey) return String(a.time || '').localeCompare(String(b.time || ''))
+      if (a._dayKey === b._dayKey) {
+        return String(a.time || '').localeCompare(String(b.time || ''))
+      }
       return a._dayKey.localeCompare(b._dayKey)
     })
 
@@ -123,7 +135,8 @@ export default function Page() {
   useEffect(() => {
     (async () => {
       try {
-        setLoading(true); setErr(null)
+        setLoading(true)
+        setErr(null)
         const data = await fetchAgenda()
         setItems(data)
       } catch (e: any) {
@@ -136,9 +149,10 @@ export default function Page() {
 
   // Titik event di kalender → hanya bulan yang sedang dilihat
   const miniEvents: MiniEvent[] = useMemo(
-    () => items
-      .filter(i => sameMonth(i._dayKey, viewYear, viewMonth))
-      .map(i => ({ date: i._dayKey })), // WAJIB _dayKey
+    () =>
+      items
+        .filter(i => sameMonth(i._dayKey, viewYear, viewMonth))
+        .map(i => ({ date: i._dayKey })), // WAJIB _dayKey
     [items, viewMonth, viewYear]
   )
 
@@ -153,17 +167,31 @@ export default function Page() {
   // Navigasi bulan
   function prevMonth() {
     const m = viewMonth - 1
-    if (m < 0) { setViewMonth(11); setViewYear(viewYear - 1) } else { setViewMonth(m) }
+    if (m < 0) {
+      setViewMonth(11)
+      setViewYear(viewYear - 1)
+    } else {
+      setViewMonth(m)
+    }
     setPicked(null)
   }
+
   function nextMonth() {
     const m = viewMonth + 1
-    if (m > 11) { setViewMonth(0); setViewYear(viewYear + 1) } else { setViewMonth(m) }
+    if (m > 11) {
+      setViewMonth(0)
+      setViewYear(viewYear + 1)
+    } else {
+      setViewMonth(m)
+    }
     setPicked(null)
   }
 
   const titleMonth = `${monthNameId(viewYear, viewMonth)} ${viewYear}`
-  const monthOptions = Array.from({ length: 12 }, (_, i) => ({ value: i, label: monthNameId(2025, i) }))
+  const monthOptions = Array.from({ length: 12 }, (_, i) => ({
+    value: i,
+    label: monthNameId(2025, i),
+  }))
   const yearOptions = Array.from({ length: 11 }, (_, k) => (viewYear - 5) + k)
 
   return (
@@ -183,17 +211,31 @@ export default function Page() {
           <div className="flex items-center gap-2">
             <select
               value={viewMonth}
-              onChange={(e) => { setViewMonth(Number(e.target.value)); setPicked(null) }}
+              onChange={e => {
+                setViewMonth(Number(e.target.value))
+                setPicked(null)
+              }}
               className="rounded-lg border bg-white px-2 py-1 text-xs shadow-sm ring-1 ring-black/5 dark:bg-slate-900"
             >
-              {monthOptions.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+              {monthOptions.map(m => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
             </select>
             <select
               value={viewYear}
-              onChange={(e) => { setViewYear(Number(e.target.value)); setPicked(null) }}
+              onChange={e => {
+                setViewYear(Number(e.target.value))
+                setPicked(null)
+              }}
               className="rounded-lg border bg-white px-2 py-1 text-xs shadow-sm ring-1 ring-black/5 dark:bg-slate-900"
             >
-              {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+              {yearOptions.map(y => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -213,7 +255,7 @@ export default function Page() {
         month={viewMonth}
         year={viewYear}
         events={miniEvents}
-        onPick={(val) => {
+        onPick={val => {
           // pastikan simpan YYYY-MM-DD sesuai bulan tampilan (anti maju-hari)
           const ymd = normalizePickToViewMonth(val, viewYear, viewMonth)
           setPicked(ymd)
@@ -245,7 +287,7 @@ export default function Page() {
       {/* Timeline */}
       {!loading && !err && (
         <section className="space-y-5">
-          {(!picked && s.length === 0) && (
+          {!picked && s.length === 0 && (
             <div className="rounded-2xl border bg-white p-4 text-center text-sm text-slate-600 shadow-sm dark:bg-slate-900">
               Belum ada agenda pada {titleMonth}.
             </div>
@@ -263,7 +305,7 @@ export default function Page() {
                 ...ev,
                 time: ev.time ?? '',
                 title: ev.title ?? '',
-                // description sengaja nggak dikirim karena tipe Item di AgendaTimelineItem nggak punya field ini
+                // tidak mengirim field description karena tipe Item di AgendaTimelineItem tidak punya field ini
                 location: ev.location ?? '',
               }}
             />
@@ -273,7 +315,9 @@ export default function Page() {
 
       {/* Footer kecil */}
       <div className="pt-2 text-center text-[11px] text-slate-500">
-        <Link href="/" className="underline">Beranda</Link>
+        <Link href="/" className="underline">
+          Beranda
+        </Link>
       </div>
     </main>
   )
