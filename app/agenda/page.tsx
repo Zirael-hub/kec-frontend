@@ -249,18 +249,19 @@ export default function Page() {
               Tidak ada agenda untuk tanggal tersebut.
             </div>
           )}
-        {listItems.map(ev => (
+{s.map(ev => (
   <AgendaTimelineItem
     key={ev.id}
     item={{
       ...ev,
-      time: ev.time ?? "",        // NULL → "" (FIX)
-      title: ev.title ?? "",      // jaga-jaga kalau null
-      description: ev.description ?? "", // opsional
-      location: ev.location ?? "", // opsional
+      time: ev.time ?? "",
+      title: ev.title ?? "",
+      description: ev.description ?? "",
+      location: ev.location ?? "",
     }}
   />
 ))}
+
 
         </section>
       )}
