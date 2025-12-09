@@ -15,7 +15,7 @@ export type EventItem = {
   time?: string | null  // "09:00 – Selesai" atau null
   location?: string | null
   banner?: string | null
-  description?: string | null
+  description?: string | nulllist
   _dayKey: string       // YYYY-MM-DD (wajib, buat kalender & filter)
 }
 
@@ -143,7 +143,7 @@ export default function Page() {
   // Daftar timeline:
   // - Jika picked → hari itu saja
   // - Jika tidak → semua event di bulan tampilan
-  const listItems = useMemo(()=>{
+  const s = useMemo(()=>{
     if (picked) return items.filter(i => i._dayKey === picked)
     return items.filter(i => sameMonth(i._dayKey, viewYear, viewMonth))
   }, [items, picked, viewMonth, viewYear])
@@ -239,19 +239,29 @@ export default function Page() {
       {/* Timeline */}
       {!loading && !err && (
         <section className="space-y-5">
-          {(!picked && listItems.length===0) && (
+          {(!picked && s.length===0) && (
             <div className="rounded-2xl border bg-white p-4 text-center text-sm text-slate-600 shadow-sm dark:bg-slate-900">
               Belum ada agenda pada {titleMonth}.
             </div>
           )}
-          {picked && listItems.length===0 && (
+          {picked && s.length===0 && (
             <div className="rounded-2xl border bg-white p-4 text-center text-sm text-slate-600 shadow-sm dark:bg-slate-900">
               Tidak ada agenda untuk tanggal tersebut.
             </div>
           )}
-          {listItems.map(ev => (
-            <AgendaTimelineItem key={ev.id} item={ev} />
-          ))}
+        {listItems.map(ev => (
+  <AgendaTimelineItem
+    key={ev.id}
+    item={{
+      ...ev,
+      time: ev.time ?? "",        // NULL → "" (FIX)
+      title: ev.title ?? "",      // jaga-jaga kalau null
+      description: ev.description ?? "", // opsional
+      location: ev.location ?? "", // opsional
+    }}
+  />
+))}
+
         </section>
       )}
 
