@@ -1,15 +1,24 @@
+'use client'
+
 type Item = {
   id: string
   title: string
-  date: string      // ISO date time
-  time?: string     // "09:00 – 11:30"
-  location?: string
+  date: string      // ISO date time / string tanggal
+  time?: string | null     // "09:00 – 11:30"
+  location?: string | null
+  description?: string | null
 }
 
 export default function AgendaTimelineItem({ item }: { item: Item }) {
   const d = new Date(item.date)
-  const day = d.getDate().toString().padStart(2,'0')
-  const mon = d.toLocaleString('id-ID', { month:'short' })
+  const isValidDate = !isNaN(d.getTime())
+
+  const day = isValidDate
+    ? d.getDate().toString().padStart(2, '0')
+    : ''
+  const mon = isValidDate
+    ? d.toLocaleString('id-ID', { month: 'short' })
+    : ''
 
   return (
     <div className="relative grid grid-cols-[56px,1fr] gap-3">
@@ -24,12 +33,25 @@ export default function AgendaTimelineItem({ item }: { item: Item }) {
       </div>
 
       {/* Card */}
-      <a href={`/agenda/${item.id}`}
-         className="group block rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99] animate-fade-in-up dark:bg-slate-900">
-        <div className="text-sm font-semibold group-hover:text-emerald-700">{item.title}</div>
-        <div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-          {item.time ? `🕑 ${item.time}` : null} {item.location ? `• 📍 ${item.location}` : null}
+      <a
+        href={`/agenda/${item.id}`}
+        className="group block rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99] animate-fade-in-up dark:bg-slate-900"
+      >
+        <div className="text-sm font-semibold group-hover:text-emerald-700">
+          {item.title}
         </div>
+
+        <div className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+          {item.time && <>🕑 {item.time}</>}
+          {item.time && item.location && ' '}
+          {item.location && <>• 📍 {item.location}</>}
+        </div>
+
+        {item.description && (
+          <p className="mt-2 line-clamp-3 text-xs text-slate-700 dark:text-slate-300">
+            {item.description}
+          </p>
+        )}
       </a>
 
       {/* vertical rail */}
