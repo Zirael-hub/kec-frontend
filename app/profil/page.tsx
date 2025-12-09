@@ -41,11 +41,15 @@ export default async function Page() {
   const officials: Official[] = Array.isArray(d.officials) ? d.officials : []
   const awards = Array.isArray(d.awards) ? d.awards : []
 
+  const bannerSrc: string =
+    d.banner ??
+    '/images/hero-sample.jpg' // fallback supaya selalu string
+
   return (
     <main className="mx-auto w-full max-w-[640px] space-y-5 px-4 pb-24 pt-4 text-slate-900 dark:text-slate-100">
       <ProfileHeader />
 
-      <ProfileBanner src={d.banner ?? undefined} />
+      <ProfileBanner src={bannerSrc} />
 
       <ProfileAbout
         description={d.about?.description ?? ''}
@@ -59,7 +63,7 @@ export default async function Page() {
         <div className="text-sm font-semibold">Struktur Organisasi</div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {officials.map((p: Official, i: number) => (
-            <OrgCard key={p.id ?? i} person={p} />
+            <OrgCard key={i} person={p} />
           ))}
           {officials.length === 0 && (
             <div className="col-span-1 text-xs text-slate-500">
